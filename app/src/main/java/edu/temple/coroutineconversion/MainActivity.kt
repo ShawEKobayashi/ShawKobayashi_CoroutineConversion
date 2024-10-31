@@ -7,6 +7,13 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.lang.Thread.sleep
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -32,11 +39,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         findViewById<Button>(R.id.revealButton).setOnClickListener{
-            Thread{
+            val scope = CoroutineScope(Job()+ Dispatchers.Default)
+            scope.launch{
                 repeat(100) {
-                    handler.sendEmptyMessage(it)
-                    Thread.sleep(40)
+                    withContext(Dispatchers.Main) {
+                        findViewById<TextView>(R.id.currentTextView).text = it.toString()
+                        findViewById<ImageView>(R.id.imageView).alpha = it.toFloat()/100f
+                    }
+                    delay(500)
                 }
             }.start()
         }
